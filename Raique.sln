@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microservices.Authenticate"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microservices.AuthenticateTests", "Microservices.AuthenticateTests\Microservices.AuthenticateTests.csproj", "{28B97DF8-5E71-4A26-86F0-24B1BE4A4458}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{03FFCDF2-7730-4F1E-BB24-7EF3EC1C6E7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database.SqlServer", "Database.SqlServer\Database.SqlServer.csproj", "{56F7D2E6-742B-4727-A6D8-D947E4485AD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{28B97DF8-5E71-4A26-86F0-24B1BE4A4458}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28B97DF8-5E71-4A26-86F0-24B1BE4A4458}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28B97DF8-5E71-4A26-86F0-24B1BE4A4458}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03FFCDF2-7730-4F1E-BB24-7EF3EC1C6E7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03FFCDF2-7730-4F1E-BB24-7EF3EC1C6E7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03FFCDF2-7730-4F1E-BB24-7EF3EC1C6E7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03FFCDF2-7730-4F1E-BB24-7EF3EC1C6E7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56F7D2E6-742B-4727-A6D8-D947E4485AD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56F7D2E6-742B-4727-A6D8-D947E4485AD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56F7D2E6-742B-4727-A6D8-D947E4485AD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56F7D2E6-742B-4727-A6D8-D947E4485AD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

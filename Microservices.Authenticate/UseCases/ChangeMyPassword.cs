@@ -1,4 +1,5 @@
 ﻿using Raique.Library;
+using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.Protocols;
 using Raique.Microservices.Authenticate.Services;
@@ -44,27 +45,36 @@ namespace Raique.Microservices.Authenticate.UseCases
         }
         private void Do()
         {
-            var userId = _tokenRepository.GetUserIdByToken(_device, _token);
-            if (userId <= 0)
-            {
-                throw InvalidTokenException.Create(_token, _appKey, _device);
-            }
-            var user = _userRepository.GetById(userId);
-            if (!user.IsValid())
-            {
-                throw InvalidTokenException.Create(_token, _appKey, _device);
-            }
-            if (!user.AppKey.Equals(_appKey))
-            {
-                throw InvalidTokenException.Create(_token, _appKey, _device);
-            }
-            string currentPassword = PasswordCreator.Create(_currentPassword, user.CheckKey);
-            if (!currentPassword.Equals(user.Password))
-            {
-                throw InvalidCurrentPasswordException.Create();
-            }
-            string newPassword = PasswordCreator.Create(_newPassword, user.CheckKey);
-            _userRepository.ChangePassword(userId, newPassword);
+            int userId = GetUserIdByToken();
+            ThrowInvalidTokenExceptionIfTrue(userId.IsLessThanOrEqualZero());
+            User user = GetUserById(userId);
+            ThrowInvalidTokenExceptionIfFalse(user.IsValid());
+            ThrowInvalidTokenExceptionIfFalse(user.AppKey.Equals(_appKey));
+            string currentPassword = CreatePasswordHash(_currentPassword, user.CheckKey);
+            ThrowInvalidCurrentPasswordExceptionIfDifferent(currentPassword, user.Password);
+            string newPassword = CreatePasswordHash(_newPassword, user.CheckKey);
+            ChangePassword(userId, newPassword);
         }
+        private int GetUserIdByToken() => _tokenRepository.GetUserIdByToken(_device, _token);
+        private User GetUserById(int userId) => _userRepository.GetById(userId);
+        private void ThrowInvalidTokenExceptionIfFalse(bool compare) => ThrowInvalidTokenExceptionIfTrue(!compare);
+        private void ThrowInvalidTokenExceptionIfTrue(bool compare)
+        {
+            if (compare)
+            {
+                ThrowInvalidTokenException();
+            }
+        }
+        private void ThrowInvalidTokenException() => throw InvalidTokenException.Create(_token, _appKey, _device);
+        private void ThrowInvalidCurrentPasswordExceptionIfDifferent(string password1, string password2)
+        {
+            if (!password1.Equals(password2))
+            {
+                ThrowInvalidCurrentPasswordException();
+            }
+        }
+        private void ThrowInvalidCurrentPasswordException() => throw InvalidCurrentPasswordException.Create();
+        private string CreatePasswordHash(string passord, string key) => PasswordCreator.Create(passord, key);
+        private void ChangePassword(int userId, string password) => _userRepository.ChangePassword(userId, password);
     }
 }
