@@ -1,4 +1,5 @@
 ﻿using Raique.Microservices.Authenticate.Protocols;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.Implementations
 {
@@ -14,27 +15,30 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
         public int CloseCount { get; private set; }
         public int CreateCount { get; private set; }
         public int GetUserIdByTokenCount { get; private set; }
-        public void Close(string device, string token)
+        public async Task Close(string device, string token)
         {
-            CloseCount++;
+            await Task.Run(() => CloseCount++);
         }
 
-        public void Create(int userId, string device, string token)
+        public async Task Create(int userId, string device, string token)
         {
-            CreateCount++;
+            await Task.Run(() => CreateCount++);
         }
 
-        public int GetUserIdByToken(string device, string token)
+        public async Task<int> GetUserIdByToken(string device, string token)
         {
-            GetUserIdByTokenCount++;
-            if ((token == "TOKEN") && (device == "DEVICE"))
+            return await Task.Run(() =>
             {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+                GetUserIdByTokenCount++;
+                if ((token == "TOKEN") && (device == "DEVICE"))
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            });
         }
     }
 }

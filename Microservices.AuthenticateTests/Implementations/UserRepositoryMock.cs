@@ -4,6 +4,7 @@ using Raique.Microservices.Authenticate.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.Implementations
 {
@@ -25,65 +26,77 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
             ChangePasswordCount = 0;
         }
 
-        public int Create(User user)
+        public async Task<int> Create(User user)
         {
-            CreateCount++;
-            user.UserId = db.Count + 2;
-            db.Add(user);
-            return user.UserId;
+            return await Task.Run(() =>
+            {
+                CreateCount++;
+                user.UserId = db.Count + 2;
+                db.Add(user);
+                return user.UserId;
+            });
         }
 
-        public User GetByKeyToApp(string key, string appKey)
+        public async Task<User> GetByKeyToApp(string key, string appKey)
         {
-            GetByKeyToAppCount++;
-            if (db.Any(f => f.Key == key && f.AppKey == appKey))
+            return await Task.Run(() =>
             {
-                return db.Where(f => f.Key == key && f.AppKey == appKey).First();
-            }
-            else if (key == "USUARIO" && appKey == "CHAVE")
-            {
-                return new User
+                GetByKeyToAppCount++;
+                if (db.Any(f => f.Key == key && f.AppKey == appKey))
                 {
-                    AppKey = "CHAVE",
-                    Key = "USUARIO",
-                    CheckKey = "CHAVE_DE_SEGURANÇA",
-                    Password = PasswordCreator.Create("SENHA", "CHAVE_DE_SEGURANÇA"),
-                    UserId = 1
-                };
-            }
-            else
-            {
-                return User.Invalid<User>();
-            }
-        }
-
-        public User GetById(int userId)
-        {
-            GetByIdCount++;
-            if (db.Any(f => f.UserId == userId))
-            {
-                return db.Where(f => f.UserId == userId).First();
-            }
-            else if (userId == 1)
-            {
-                return new User
+                    return db.Where(f => f.Key == key && f.AppKey == appKey).First();
+                }
+                else if (key == "USUARIO" && appKey == "CHAVE")
                 {
-                    AppKey = "CHAVE",
-                    Key = "USUARIO",
-                    CheckKey = "CHAVE_DE_SEGURANÇA",
-                    Password = PasswordCreator.Create("SENHA", "CHAVE_DE_SEGURANÇA"),
-                    UserId = 1
-                };
-            }
-            else
-            {
-                return User.Invalid<User>();
-            }
+                    return new User
+                    {
+                        AppKey = "CHAVE",
+                        Key = "USUARIO",
+                        CheckKey = "CHAVE_DE_SEGURANÇA",
+                        Password = PasswordCreator.Create("SENHA", "CHAVE_DE_SEGURANÇA"),
+                        UserId = 1
+                    };
+                }
+                else
+                {
+                    return User.Invalid<User>();
+                }
+            });
         }
 
-        public void ChangePassword(int userId, string password)
+        public async Task<User> GetById(int userId)
         {
-            ChangePasswordCount++;
+            return await Task.Run(() =>
+            {
+                GetByIdCount++;
+                if (db.Any(f => f.UserId == userId))
+                {
+                    return db.Where(f => f.UserId == userId).First();
+                }
+                else if (userId == 1)
+                {
+                    return new User
+                    {
+                        AppKey = "CHAVE",
+                        Key = "USUARIO",
+                        CheckKey = "CHAVE_DE_SEGURANÇA",
+                        Password = PasswordCreator.Create("SENHA", "CHAVE_DE_SEGURANÇA"),
+                        UserId = 1
+                    };
+                }
+                else
+                {
+                    return User.Invalid<User>();
+                }
+            });
+        }
+
+        public async Task ChangePassword(int userId, string password)
+        {
+            await Task.Run(() =>
+            {
+                ChangePasswordCount++;
+            });
         }
     }
 }

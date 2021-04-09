@@ -2,6 +2,7 @@
 using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.Protocols;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.UseCases
 {
@@ -13,9 +14,9 @@ namespace Raique.Microservices.Authenticate.UseCases
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
 
-        public static User Execute(ITokenRepository tokenRepository, IUserRepository userRepository,
+        public static async Task<User> Execute(ITokenRepository tokenRepository, IUserRepository userRepository,
             string token, string appKey, string device) =>
-            new GetTokenInfo(tokenRepository, userRepository, token, appKey, device).Do();
+            await new GetTokenInfo(tokenRepository, userRepository, token, appKey, device).Do();
         private GetTokenInfo(ITokenRepository tokenRepository, IUserRepository userRepository,
             string token, string appKey, string device)
         {
@@ -35,14 +36,14 @@ namespace Raique.Microservices.Authenticate.UseCases
             _userRepository.ThrowIfNull("userRepository");
         }
 
-        private User Do()
+        private async Task<User> Do()
         {
-            int userId = _tokenRepository.GetUserIdByToken(_device, _token);
+            int userId = await _tokenRepository.GetUserIdByToken(_device, _token);
             if (userId <= 0)
             {
                 throw InvalidTokenException.Create(_token, _appKey, _device);
             }
-            var user = _userRepository.GetById(userId);
+            var user = await _userRepository.GetById(userId);
             if (!user.IsValid())
             {
                 throw InvalidTokenException.Create(_token, _appKey, _device);

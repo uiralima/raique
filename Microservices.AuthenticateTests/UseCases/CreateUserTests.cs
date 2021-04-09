@@ -3,6 +3,7 @@ using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.UseCases;
 using Raique.Microservices.AuthenticateTests.Implementations;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.UseCases
 {
@@ -15,13 +16,13 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow(false, false, "Key", DisplayName = "UserName Empty")]
         [DataRow(false, false, "Key", "UserName", DisplayName = "Password Empty")]
         [TestMethod()]
-        public void CreateUserInvalidParametersTest(bool isAppRepNull, bool isUserRepNull, string key = "", string userName = "", string password = "")
+        public async Task CreateUserInvalidParametersTest(bool isAppRepNull, bool isUserRepNull, string key = "", string userName = "", string password = "")
         {
             var appRep = isAppRepNull ? null : AppRepositoryMock.CreateRepository();
             var userRep = isUserRepNull ? null : UserRepositoryMock.CreateRepository();
             try
             {
-                CreateUser.Execute(appRep, userRep, key, userName, password);
+                await CreateUser.Execute(appRep, userRep, key, userName, password);
                 Assert.Fail();
             }
             catch (Exception ex)
@@ -38,13 +39,13 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("Chave2", "Usuario2", "Senha", false, true, true, DisplayName = "Não achou o app")]
         [DataRow(null, "Usuario2", "Senha", false, false, false, DisplayName = "Parametro inválido")]
         [TestMethod()]
-        public void CreateUserFlowTest(string appKey = "", string userName = "", string password = "", bool incCreate = false, bool incGetByKeyToAppCount = false, bool incAppGetByKey = false)
+        public async Task CreateUserFlowTest(string appKey = "", string userName = "", string password = "", bool incCreate = false, bool incGetByKeyToAppCount = false, bool incAppGetByKey = false)
         {
             var userRep = UserRepositoryMock.CreateRepository();
             var appRep = AppRepositoryMock.CreateRepository();
             try
             {
-                CreateUser.Execute(appRep, userRep, appKey, userName, password);
+                await CreateUser.Execute(appRep, userRep, appKey, userName, password);
                 Assert.AreEqual(userRep.CreateCount, incCreate ? 1 : 0);
                 Assert.AreEqual(userRep.GetByKeyToAppCount, incGetByKeyToAppCount ? 1 : 0);
                 Assert.AreEqual(appRep.GetByKeyCount, incAppGetByKey ? 1 : 0, "Não deveria ter chamado a verificação de app");
@@ -61,13 +62,13 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("Chave", "Usuario2", "Senha", true, typeof(UserAlreadExistsException), DisplayName = "Inserindo Usuário com o mesmo nome")]
         [DataRow("Chave2", "Usuario3", "Senha", true, typeof(InvalidAppException), DisplayName = "Tentando reiserir App 2")]
         [TestMethod()]
-        public void CreateUserTest(string appKey, string userName, string password, bool exception, Type exceptionType = null)
+        public async Task CreateUserTest(string appKey, string userName, string password, bool exception, Type exceptionType = null)
         {
             var userRep = UserRepositoryMock.CreateRepository();
             var appRep = AppRepositoryMock.CreateRepository();
             try
             {
-                CreateUser.Execute(appRep, userRep, appKey, userName, password);
+                await CreateUser.Execute(appRep, userRep, appKey, userName, password);
                 Assert.IsFalse(exception);
             }
             catch (Exception ex)

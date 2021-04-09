@@ -3,6 +3,7 @@ using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.UseCases;
 using Raique.Microservices.AuthenticateTests.Implementations;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.UseCases
 {
@@ -13,12 +14,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("App02", false, DisplayName = "Iserindo App 2")]
         [DataRow("App02", true, typeof(AppAlreadExistsException), DisplayName = "Tentando reiserir App 2")]
         [TestMethod()]
-        public void CreateAppTest(string appName, bool exception, Type exceptionType = null)
+        public async Task CreateAppTest(string appName, bool exception, Type exceptionType = null)
         {
             var rep = AppRepositoryMock.CreateRepository();
             try
             {
-                CreateApp.Execute(rep, appName);
+                await CreateApp.Execute(rep, appName);
                 Assert.IsFalse(exception);
             }
             catch (Exception ex)
@@ -30,12 +31,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("App03", true, DisplayName = "Repository Null")]
         [DataRow(null, false, DisplayName = "App Null")]
         [TestMethod()]
-        public void CreateAppInvalidParametersTest(string appName, bool isRepNull)
+        public async Task CreateAppInvalidParametersTest(string appName, bool isRepNull)
         {
             var rep = isRepNull ? null : AppRepositoryMock.CreateRepository();
             try
             {
-                CreateApp.Execute(rep, appName);
+                await CreateApp .Execute(rep, appName);
                 Assert.Fail();
             }
             catch (Exception ex)
@@ -48,12 +49,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("App 04", false, true, DisplayName = "Passou apenas pelo GetByName")]
         [DataRow(null, false, false, DisplayName = "Não passou em nenhum")]
         [TestMethod()]
-        public void CreateAppFlowTest(string appName, bool incCreate, bool incGetByName)
+        public async Task CreateAppFlowTest(string appName, bool incCreate, bool incGetByName)
         {
             var rep = AppRepositoryMock.CreateRepository();
             try
             {
-                CreateApp.Execute(rep, appName);
+                await CreateApp .Execute(rep, appName);
                 Assert.AreEqual(rep.CreateCount, incCreate ? 1 : 0);
                 Assert.AreEqual(rep.GetByNameCount, incGetByName ? 1 : 0);
             }

@@ -3,6 +3,7 @@ using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.UseCases;
 using Raique.Microservices.AuthenticateTests.Implementations;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.UseCases
 {
@@ -17,14 +18,14 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow(false, false, false, "Key", "UserName", DisplayName = "Password Empty")]
         [DataRow(false, false, false, "Key", "UserName", "Password", DisplayName = "Device Empty")]
         [TestMethod()]
-        public void LoginInvalidParametersTest(bool isTokenRepNull, bool isUserRepNull, bool isTokenCreatorNull, string key = "", string userName = "", string password = "", string device = "")
+        public async Task LoginInvalidParametersTest(bool isTokenRepNull, bool isUserRepNull, bool isTokenCreatorNull, string key = "", string userName = "", string password = "", string device = "")
         {
             var tokenRep = isTokenRepNull ? null : TokenRepositoryMock.CreateRepository();
             var userRep = isUserRepNull ? null : UserRepositoryMock.CreateRepository();
             var tokenCreator = isTokenCreatorNull ? null : TokenCreatorMock.Create();
             try
             {
-                Login.Execute(tokenRep, userRep, tokenCreator, key, userName, password, device);
+                await Login.Execute(tokenRep, userRep, tokenCreator, key, userName, password, device);
                 Assert.Fail();
             }
             catch (Exception ex)
@@ -39,14 +40,14 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("CHAVE", "USUARIO", "SENHA", "DEVICE", true, true, true, DisplayName = "Login Válido")]
         [DataRow("CHAVE2", "USUARIO", "SENHA", "DEVICE", true, false, false, DisplayName = "Login Inválido")]
         [TestMethod()]
-        public void LoginFlowTest(string appKey = "", string userName = "", string password = "", string device = "", bool callGetByKeyToAppCount = false, bool callCreateToken = false, bool callTokenCreator = false)
+        public async Task LoginFlowTest(string appKey = "", string userName = "", string password = "", string device = "", bool callGetByKeyToAppCount = false, bool callCreateToken = false, bool callTokenCreator = false)
         {
             var userRep = UserRepositoryMock.CreateRepository();
             var tokenRep = TokenRepositoryMock.CreateRepository();
             var tokenCreator = TokenCreatorMock.Create();
             try
             {
-                Login.Execute(tokenRep, userRep, tokenCreator, appKey, userName, password, device);
+                await Login.Execute(tokenRep, userRep, tokenCreator, appKey, userName, password, device);
                 Assert.AreEqual(userRep.GetByKeyToAppCount, callGetByKeyToAppCount ? 1 : 0);
                 Assert.AreEqual(tokenRep.CreateCount, callCreateToken ? 1 : 0);
                 Assert.AreEqual(tokenCreator.CreateCount, callTokenCreator ? 1 : 0);
@@ -64,14 +65,14 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("CHAVE", "USUARIO", "SENHAINVALIDA", "DEVICE", true, typeof(InvalidUsernameOrPasswordException), DisplayName = "Senha Inválida")]
         [DataRow("CHAVEINVALIDA", "USUARIO", "SENHA", "DEVICE", true, typeof(InvalidUsernameOrPasswordException), DisplayName = "Chave Inválida")]
         [TestMethod()]
-        public void LoginCodeTest(string appKey, string userName, string password, string device, bool exception, Type exceptionType = null)
+        public async Task LoginCodeTest(string appKey, string userName, string password, string device, bool exception, Type exceptionType = null)
         {
             var userRep = UserRepositoryMock.CreateRepository();
             var tokenRep = TokenRepositoryMock.CreateRepository();
             var tokenCreator = TokenCreatorMock.Create();
             try
             {
-                Login.Execute(tokenRep, userRep, tokenCreator, appKey, userName, password, device);
+                await Login.Execute(tokenRep, userRep, tokenCreator, appKey, userName, password, device);
                 Assert.IsFalse(exception);
             }
             catch (Exception ex)

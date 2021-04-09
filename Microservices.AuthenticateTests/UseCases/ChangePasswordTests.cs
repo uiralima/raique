@@ -3,6 +3,7 @@ using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.UseCases;
 using Raique.Microservices.AuthenticateTests.Implementations;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.UseCases
 {
@@ -14,13 +15,13 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow(false, 1, "", "CHAVE", DisplayName = "Nova senha invalida")]
         [DataRow(false, 1, "NOVO", "", DisplayName = "Chave invalida")]
         [TestMethod()]
-        public void ChangePasswordInvalidParametersTest(bool isUserRepNull, int userId, string newPassword, string appKey)
+        public async Task ChangePasswordInvalidParametersTest(bool isUserRepNull, int userId, string newPassword, string appKey)
         {
             var userRep = isUserRepNull ? null : UserRepositoryMock.CreateRepository();
 
             try
             {
-                ChangePassword.Execute(userRep, userId, newPassword, appKey);
+                await ChangePassword.Execute(userRep, userId, newPassword, appKey);
                 Assert.Fail();
             }
             catch (Exception ex)
@@ -36,12 +37,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow(0, "NOVO", "CHAVE", false, false)]
         [DataRow(1, "NOVO", "CHAVE_INVALIDA", true, false)]
         [TestMethod()]
-        public void ChangePasswordFlowTest(int userId, string newPassword, string appKey, bool callGetById, bool callChangePassword)
+        public async Task ChangePasswordFlowTest(int userId, string newPassword, string appKey, bool callGetById, bool callChangePassword)
         {
             var userRep = UserRepositoryMock.CreateRepository();
             try
             {
-                ChangePassword.Execute(userRep, userId, newPassword, appKey);
+                await ChangePassword.Execute(userRep, userId, newPassword, appKey);
                 Assert.AreEqual(userRep.GetByIdCount, callGetById ? 1 : 0);
                 Assert.AreEqual(userRep.ChangePasswordCount, callChangePassword ? 1 : 0);
             }
@@ -56,12 +57,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow(15, "NOVO", "CHAVE", true, typeof(InvalidUserException))]
         [DataRow(1, "NOVO", "CHAVE_INVALIDA", true, typeof(InvalidUserException))]
         [TestMethod()]
-        public void ChangePasswordCodeTest(int userId, string newPassword, string appKey, bool exception, Type exceptionType = null)
+        public async Task ChangePasswordCodeTest(int userId, string newPassword, string appKey, bool exception, Type exceptionType = null)
         {
             var userRep = UserRepositoryMock.CreateRepository();
             try
             {
-                ChangePassword.Execute(userRep, userId, newPassword, appKey);
+                await ChangePassword.Execute(userRep, userId, newPassword, appKey);
                 Assert.IsFalse(exception);
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using Raique.Microservices.Authenticate.Protocols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.Implementations
 {
@@ -22,52 +23,61 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
             GetByKeyCount = 0;
         }
 
-        public int Create(string name, string key)
+        public async Task<int> Create(string name, string key)
         {
-            int id = db.Count + 2;
-            db.Add(new App
+            return await Task.Run(() =>
             {
-                AppId = id,
-                Key = key,
-                Name = name
-            });
-            CreateCount++;
-            return id;
-        }
-
-        public App GetByName(string appName)
-        {
-            GetByNameCount++;
-            if (db.Any(f => f.Name == appName))
-            {
-                return db.Where(f => f.Name == appName).First();
-            }
-            else
-            {
-                return App.Invalid<App>();
-            }
-        }
-
-        public App GetByKey(string key)
-        {
-            GetByKeyCount++;
-            if (db.Any(f => f.Key == key))
-            {
-                return db.Where(f => f.Key == key).First();
-            }
-            else if (key == "Chave")
-            {
-                return new App
+                int id = db.Count + 2;
+                db.Add(new App
                 {
-                    AppId = 1,
-                    Key = "Chave",
-                    Name = "Mock"
-                };
-            }
-            else
+                    AppId = id,
+                    Key = key,
+                    Name = name
+                });
+                CreateCount++;
+                return id;
+            });
+        }
+
+        public async Task<App> GetByName(string appName)
+        {
+            return await Task.Run(() =>
             {
-                return App.Invalid<App>();
-            }
+                GetByNameCount++;
+                if (db.Any(f => f.Name == appName))
+                {
+                    return db.Where(f => f.Name == appName).First();
+                }
+                else
+                {
+                    return App.Invalid<App>();
+                }
+            });
+        }
+
+        public async Task<App> GetByKey(string key)
+        {
+            return await Task.Run(() =>
+            {
+                GetByKeyCount++;
+                if (db.Any(f => f.Key == key))
+                {
+                    return db.Where(f => f.Key == key).First();
+                }
+                else if (key == "Chave")
+                {
+                    return new App
+                    {
+                        AppId = 1,
+                        Key = "Chave",
+                        Name = "Mock"
+                    };
+                }
+                else
+                {
+                    return App.Invalid<App>();
+                }
+            });
         }
     }
 }

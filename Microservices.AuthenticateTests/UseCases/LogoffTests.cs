@@ -2,6 +2,7 @@
 using Raique.Microservices.Authenticate.UseCases;
 using Raique.Microservices.AuthenticateTests.Implementations;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.AuthenticateTests.UseCases
 {
@@ -12,12 +13,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow(false, "", "DEVICE", DisplayName = "Token Empty")]
         [DataRow(false, "TOKEN", "", DisplayName = "Devcice Empty")]
         [TestMethod()]
-        public void LogoffInvalidParametersTest(bool isTokenRepNull, string token, string device)
+        public async Task LogoffInvalidParametersTest(bool isTokenRepNull, string token, string device)
         {
             var tokenRep = isTokenRepNull ? null : TokenRepositoryMock.CreateRepository();
             try
             {
-                Logoff.Execute(tokenRep, token, device);
+                await Logoff.Execute(tokenRep, token, device);
                 Assert.Fail();
             }
             catch (Exception ex)
@@ -33,12 +34,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("TOKEN_INVALIDO", "DEVICE", true)]
         [DataRow("TOKEN", "DEVICE_INVALIDO", true)]
         [TestMethod()]
-        public void LogoffFlowTest(string token, string device, bool callCloseCount)
+        public async Task LogoffFlowTest(string token, string device, bool callCloseCount)
         {
             var tokenRep = TokenRepositoryMock.CreateRepository();
             try
             {
-                Logoff.Execute(tokenRep, token, device);
+                await Logoff.Execute(tokenRep, token, device);
                 Assert.AreEqual(tokenRep.CloseCount, callCloseCount ? 1 : 0);
             }
             catch
@@ -51,12 +52,12 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
         [DataRow("TOKEN_INVALIDO", "DEVICE", false, DisplayName = "Token inválido")]
         [DataRow("TOKEN", "DEVICE_INVALIDO", false, DisplayName = "Device inválido")]
         [TestMethod()]
-        public void LogoffCodeTest(string token, string device, bool exception, Type exceptionType = null)
+        public async Task LogoffCodeTest(string token, string device, bool exception, Type exceptionType = null)
         {
             var tokenRep = TokenRepositoryMock.CreateRepository();
             try
             {
-                Logoff.Execute(tokenRep, token, device);
+                await Logoff.Execute(tokenRep, token, device);
                 Assert.IsFalse(exception);
             }
             catch (Exception ex)

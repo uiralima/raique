@@ -3,14 +3,15 @@ using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.Protocols;
 using Raique.Microservices.Authenticate.Services;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.UseCases
 {
     public class Login
     {
-        public static string Execute(ITokenRepository tokenRepository,
+        public static async Task<string> Execute(ITokenRepository tokenRepository,
             IUserRepository userRepository, ITokenCreator tokenCreator, string appKey, string userName, string password, string device) =>
-               new Login(tokenRepository, userRepository, tokenCreator, appKey, userName, password, device).Do();
+               await new Login(tokenRepository, userRepository, tokenCreator, appKey, userName, password, device).Do();
 
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
@@ -42,9 +43,9 @@ namespace Raique.Microservices.Authenticate.UseCases
             _device.ThrowIfIsNullOrEmpty("device");
         }
 
-        private string Do()
+        private async Task<string> Do()
         {
-            var user = _userRepository.GetByKeyToApp(_userName, _appKey);
+            var user = await _userRepository.GetByKeyToApp(_userName, _appKey);
             if (!user.IsValid())
             {
                 throw InvalidUsernameOrPasswordException.Create(_userName, _appKey);

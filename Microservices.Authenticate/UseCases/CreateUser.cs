@@ -2,14 +2,15 @@
 using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.Protocols;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.UseCases
 {
     public class CreateUser
     {
-        public static int Execute(IAppRepository appRepository, IUserRepository userRepository,
+        public static async Task<int> Execute(IAppRepository appRepository, IUserRepository userRepository,
             string appKey, string userName, string password) =>
-            new CreateUser(appRepository, userRepository, appKey, userName, password).Do();
+            await new CreateUser(appRepository, userRepository, appKey, userName, password).Do();
 
         private readonly IAppRepository _appRepository;
         private readonly IUserRepository _userRepository;
@@ -35,18 +36,18 @@ namespace Raique.Microservices.Authenticate.UseCases
             _password.ThrowIfIsNullOrEmpty("password");
         }
 
-        private int Do()
+        private async Task<int> Do()
         {
-            if (UserNameAlreadExists())
+            if (await UserNameAlreadExists())
             {
                 throw UserAlreadExistsException.Create(_userName);
             }
-            if (!AppAlreadExists())
+            if (!await AppAlreadExists())
             {
                 throw InvalidAppException.Create();
             }
             string checkKey = CreateRandomKey();
-            return _userRepository.Create(new Domain.User
+            return await _userRepository.Create(new Domain.User
             {
                 AppKey = _appKey,
                 Key = _userName,
@@ -55,14 +56,14 @@ namespace Raique.Microservices.Authenticate.UseCases
             });
         }
 
-        private bool UserNameAlreadExists()
+        private async Task<bool> UserNameAlreadExists()
         {
-            return _userRepository.GetByKeyToApp(_userName, _appKey).IsValid();
+            return (await _userRepository.GetByKeyToApp(_userName, _appKey)).IsValid();
         }
 
-        private bool AppAlreadExists()
+        private async Task<bool> AppAlreadExists()
         {
-            return _appRepository.GetByKey(_appKey).IsValid();
+            return (await _appRepository.GetByKey(_appKey)).IsValid();
         }
 
         private string CreateRandomKey()

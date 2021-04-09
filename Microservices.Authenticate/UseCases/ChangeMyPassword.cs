@@ -4,6 +4,7 @@ using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.Protocols;
 using Raique.Microservices.Authenticate.Services;
 using System;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.UseCases
 {
@@ -16,10 +17,12 @@ namespace Raique.Microservices.Authenticate.UseCases
         private readonly string _newPassword;
         private readonly string _appKey;
         private readonly string _device;
+        private readonly Func<Exception> InvalidTokenExceptionCreator;
+        private readonly Func<Exception> InvalidCurrentPasswordExceptionCreator;
 
-        public static void Execute(ITokenRepository tokenRepository, IUserRepository userRepository,
+        public static async Task Execute(ITokenRepository tokenRepository, IUserRepository userRepository,
             string token, string currentPassword, string newPassword, string appKey, string device) =>
-            new ChangeMyPassword(tokenRepository, userRepository, token, currentPassword, newPassword, appKey, device).Do();
+            await new ChangeMyPassword(tokenRepository, userRepository, token, currentPassword, newPassword, appKey, device).Do();
         private ChangeMyPassword(ITokenRepository tokenRepository, IUserRepository userRepository,
             string token, string currentPassword, string newPassword, string appKey, string device)
         {
@@ -31,6 +34,8 @@ namespace Raique.Microservices.Authenticate.UseCases
             _appKey = appKey;
             _device = device;
             ValidateInstance();
+            InvalidTokenExceptionCreator = () => InvalidTokenException.Create(_token, _appKey, _device);
+            InvalidCurrentPasswordExceptionCreator = () => InvalidCurrentPasswordException.Create();
         }
         private void ValidateInstance()
         {
@@ -43,38 +48,20 @@ namespace Raique.Microservices.Authenticate.UseCases
             _appKey.ThrowIfIsNullOrEmpty("appKey");
             _device.ThrowIfIsNullOrEmpty("device");
         }
-        private void Do()
+        private async Task Do()
         {
-            int userId = GetUserIdByToken();
-            ThrowInvalidTokenExceptionIfTrue(userId.IsLessThanOrEqualZero());
-            User user = GetUserById(userId);
-            ThrowInvalidTokenExceptionIfFalse(user.IsValid());
-            ThrowInvalidTokenExceptionIfFalse(user.AppKey.Equals(_appKey));
+            int userId = await GetUserIdByToken();
+            InvalidTokenExceptionCreator.ThrowIfTrue(userId.IsLessThanOrEqualZero());
+            User user = await GetUserById(userId);
+            InvalidTokenExceptionCreator.ThrowIfFalse(user.IsValid() && user.AppKey.Equals(_appKey));
             string currentPassword = CreatePasswordHash(_currentPassword, user.CheckKey);
-            ThrowInvalidCurrentPasswordExceptionIfDifferent(currentPassword, user.Password);
+            InvalidCurrentPasswordExceptionCreator.ThrowIfFalse(currentPassword.Equals(user.Password));
             string newPassword = CreatePasswordHash(_newPassword, user.CheckKey);
-            ChangePassword(userId, newPassword);
+            await ChangePassword(userId, newPassword);
         }
-        private int GetUserIdByToken() => _tokenRepository.GetUserIdByToken(_device, _token);
-        private User GetUserById(int userId) => _userRepository.GetById(userId);
-        private void ThrowInvalidTokenExceptionIfFalse(bool compare) => ThrowInvalidTokenExceptionIfTrue(!compare);
-        private void ThrowInvalidTokenExceptionIfTrue(bool compare)
-        {
-            if (compare)
-            {
-                ThrowInvalidTokenException();
-            }
-        }
-        private void ThrowInvalidTokenException() => throw InvalidTokenException.Create(_token, _appKey, _device);
-        private void ThrowInvalidCurrentPasswordExceptionIfDifferent(string password1, string password2)
-        {
-            if (!password1.Equals(password2))
-            {
-                ThrowInvalidCurrentPasswordException();
-            }
-        }
-        private void ThrowInvalidCurrentPasswordException() => throw InvalidCurrentPasswordException.Create();
+        private async Task<int> GetUserIdByToken() => await _tokenRepository.GetUserIdByToken(_device, _token);
+        private async Task<User> GetUserById(int userId) => await _userRepository.GetById(userId);
         private string CreatePasswordHash(string passord, string key) => PasswordCreator.Create(passord, key);
-        private void ChangePassword(int userId, string password) => _userRepository.ChangePassword(userId, password);
+        private async Task ChangePassword(int userId, string password) => await _userRepository.ChangePassword(userId, password);
     }
 }

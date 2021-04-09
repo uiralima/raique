@@ -1,12 +1,13 @@
 ﻿using Raique.Microservices.Authenticate.Domain;
+using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.Protocols
 {
     public interface IUserRepository
     {
-        User GetByKeyToApp(string key, string appKey);
-        int Create(User user);
-        User GetById(int userId);
-        void ChangePassword(int userId, string password);
+        Task<User> GetByKeyToApp(string key, string appKey);
+        Task<int> Create(User user);
+        Task<User> GetById(int userId);
+        Task ChangePassword(int userId, string password);
     }
 }
