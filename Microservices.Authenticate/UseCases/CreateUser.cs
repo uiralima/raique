@@ -17,6 +17,8 @@ namespace Raique.Microservices.Authenticate.UseCases
         private readonly string _appKey;
         private readonly string _userName;
         private readonly string _password;
+        private readonly Func<Exception> UserAlreadExistsExceptionCreator;
+        private readonly Func<Exception> InvalidAppExceptionCreator;
 
         private CreateUser(IAppRepository appRepository, IUserRepository userRepository, string appKey, string userName, string password)
         {
@@ -26,6 +28,8 @@ namespace Raique.Microservices.Authenticate.UseCases
             _userName = userName;
             _password = password;
             ValidateInstance();
+            UserAlreadExistsExceptionCreator = () => UserAlreadExistsException.Create(_userName);
+            InvalidAppExceptionCreator = () => InvalidAppException.Create();
         }
         private void ValidateInstance()
         {
@@ -38,23 +42,18 @@ namespace Raique.Microservices.Authenticate.UseCases
 
         private async Task<int> Do()
         {
-            if (await UserNameAlreadExists())
-            {
-                throw UserAlreadExistsException.Create(_userName);
-            }
-            if (!await AppAlreadExists())
-            {
-                throw InvalidAppException.Create();
-            }
-            string checkKey = CreateRandomKey();
-            return await _userRepository.Create(new Domain.User
-            {
-                AppKey = _appKey,
-                Key = _userName,
-                CheckKey = checkKey,
-                Password = Services.PasswordCreator.Create(_password, checkKey)
-            });
+            UserAlreadExistsExceptionCreator.ThrowIfTrue(await UserNameAlreadExists());
+            InvalidAppExceptionCreator.ThrowIfFalse(await AppAlreadExists());
+            return await _userRepository.Create(CreateUserWithData(CreateRandomKey()));
         }
+
+        private Domain.User CreateUserWithData(string checkKey) => new Domain.User
+        {
+            AppKey = _appKey,
+            Key = _userName,
+            CheckKey = checkKey,
+            Password = Services.PasswordCreator.Create(_password, checkKey)
+        };
 
         private async Task<bool> UserNameAlreadExists()
         {

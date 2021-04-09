@@ -2,6 +2,7 @@
 using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Exceptions;
 using Raique.Microservices.Authenticate.Protocols;
+using System;
 using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.UseCases
@@ -13,6 +14,7 @@ namespace Raique.Microservices.Authenticate.UseCases
         private readonly string _appKey;
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
+        private readonly Func<Exception> InvalidTokenExceptionCreator;
 
         public static async Task<User> Execute(ITokenRepository tokenRepository, IUserRepository userRepository,
             string token, string appKey, string device) =>
@@ -26,6 +28,7 @@ namespace Raique.Microservices.Authenticate.UseCases
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
             ValidateInstance();
+            InvalidTokenExceptionCreator = () => InvalidTokenException.Create(_token, _appKey, _device);
         }
         private void ValidateInstance()
         {
@@ -39,19 +42,10 @@ namespace Raique.Microservices.Authenticate.UseCases
         private async Task<User> Do()
         {
             int userId = await _tokenRepository.GetUserIdByToken(_device, _token);
-            if (userId <= 0)
-            {
-                throw InvalidTokenException.Create(_token, _appKey, _device);
-            }
+            InvalidTokenExceptionCreator.ThrowIfTrue(userId <= 0);
             var user = await _userRepository.GetById(userId);
-            if (!user.IsValid())
-            {
-                throw InvalidTokenException.Create(_token, _appKey, _device);
-            }
-            if (!user.AppKey.Equals(_appKey))
-            {
-                throw InvalidTokenException.Create(_token, _appKey, _device);
-            }
+            InvalidTokenExceptionCreator.ThrowIfFalse(user.IsValid());
+            InvalidTokenExceptionCreator.ThrowIfFalse(user.AppKey.Equals(_appKey));
             return user;
         }
     }

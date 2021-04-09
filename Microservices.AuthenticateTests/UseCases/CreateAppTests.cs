@@ -36,7 +36,7 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
             var rep = isRepNull ? null : AppRepositoryMock.CreateRepository();
             try
             {
-                await CreateApp .Execute(rep, appName);
+                await CreateApp.Execute(rep, appName);
                 Assert.Fail();
             }
             catch (Exception ex)
@@ -54,7 +54,7 @@ namespace Raique.Microservices.AuthenticateTests.UseCases
             var rep = AppRepositoryMock.CreateRepository();
             try
             {
-                await CreateApp .Execute(rep, appName);
+                await CreateApp.Execute(rep, appName);
                 Assert.AreEqual(rep.CreateCount, incCreate ? 1 : 0);
                 Assert.AreEqual(rep.GetByNameCount, incGetByName ? 1 : 0);
             }

@@ -20,6 +20,7 @@ namespace Raique.Microservices.Authenticate.UseCases
         private readonly string _userName;
         private readonly string _password;
         private readonly string _device;
+        private readonly Func<Exception> InvalidUsernameOrPasswordExceptionCreator;
 
         private Login(ITokenRepository tokenRepository, IUserRepository userRepository, ITokenCreator tokenCreator, string appKey, string userName, string password, string device)
         {
@@ -31,6 +32,7 @@ namespace Raique.Microservices.Authenticate.UseCases
             _tokenCreator = tokenCreator;
             _device = device;
             ValidateInstance();
+            InvalidUsernameOrPasswordExceptionCreator = () => InvalidUsernameOrPasswordException.Create(_userName, _appKey);
         }
         private void ValidateInstance()
         {
@@ -46,23 +48,12 @@ namespace Raique.Microservices.Authenticate.UseCases
         private async Task<string> Do()
         {
             var user = await _userRepository.GetByKeyToApp(_userName, _appKey);
-            if (!user.IsValid())
-            {
-                throw InvalidUsernameOrPasswordException.Create(_userName, _appKey);
-            }
+            InvalidUsernameOrPasswordExceptionCreator.ThrowIfFalse(user.IsValid());
             string typedPassword = PasswordCreator.Create(_password, user.CheckKey);
-            if (!user.Password.Equals(typedPassword))
-            {
-                throw InvalidUsernameOrPasswordException.Create(_userName, _appKey);
-            }
+            InvalidUsernameOrPasswordExceptionCreator.ThrowIfFalse(user.Password.Equals(typedPassword));
             string token = _tokenCreator.Create(user);
-            _tokenRepository.Create(user.UserId, _device, token);
+            await _tokenRepository.Create(user.UserId, _device, token);
             return token;
-        }
-
-        private string CreateRandomKey()
-        {
-            return Guid.NewGuid().ToString();
         }
     }
 }
