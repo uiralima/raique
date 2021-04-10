@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace Raique.Database.Contracts
 {
@@ -66,20 +67,7 @@ namespace Raique.Database.Contracts
 
         public virtual DbDataReader ExecuteReader(bool startTransaction)
         {
-            this._command.CommandType = this._type;
-            this._command.Parameters.AddRange(this._parameters.ToArray());
-            if (this._conn.State != System.Data.ConnectionState.Open)
-            {
-                this._conn.Open();
-            }
-            if (startTransaction)
-            {
-                this._transaction = this._conn.BeginTransaction(System.Data.IsolationLevel.ReadUncommitted);
-            }
-            if (null != this._transaction)
-            {
-                this._command.Transaction = this._transaction;
-            }
+            PrepareToExecute(startTransaction);
             try
             {
                 return this._command.ExecuteReader();
@@ -93,20 +81,7 @@ namespace Raique.Database.Contracts
 
         public virtual int ExecuteNonQuery(bool startTransaction)
         {
-            this._command.CommandType = this._type;
-            this._command.Parameters.AddRange(this._parameters.ToArray());
-            if (this._conn.State != System.Data.ConnectionState.Open)
-            {
-                this._conn.Open();
-            }
-            if (startTransaction)
-            {
-                this._transaction = this._conn.BeginTransaction(System.Data.IsolationLevel.ReadUncommitted);
-            }
-            if (null != this._transaction)
-            {
-                this._command.Transaction = this._transaction;
-            }
+            PrepareToExecute(startTransaction);
             try
             {
                 return this._command.ExecuteNonQuery();
@@ -144,6 +119,62 @@ namespace Raique.Database.Contracts
         public virtual int ExecuteNonQuery()
         {
             return ExecuteNonQuery(true);
+        }
+
+        public virtual Task<int> ExecuteNonQueryAsync()
+        {
+            return ExecuteNonQueryAsync(true);
+        }
+
+        public virtual Task<int> ExecuteNonQueryAsync(bool startTransaction)
+        {
+            PrepareToExecute(startTransaction);
+            try
+            {
+                return this._command.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                _isOk = false;
+                throw ex;
+            }
+        }
+
+        public virtual Task<DbDataReader> ExecuteReaderAsync()
+        {
+            return ExecuteReaderAsync(true);
+        }
+
+        public virtual Task<DbDataReader> ExecuteReaderAsync(bool startTransaction)
+        {
+            PrepareToExecute(startTransaction);
+            try
+            {
+                return this._command.ExecuteReaderAsync();
+            }
+            catch (Exception ex)
+            {
+                _isOk = false;
+                throw ex;
+            }
+        }
+
+        private void PrepareToExecute(bool startTransaction)
+        {
+            this._command.CommandType = this._type;
+            this._command.Parameters.AddRange(this._parameters.ToArray());
+            if (this._conn.State != System.Data.ConnectionState.Open)
+            {
+                this._conn.Open();
+            }
+            if (startTransaction)
+            {
+                this._transaction = this._conn.BeginTransaction(System.Data.IsolationLevel.ReadUncommitted);
+            }
+            if (null != this._transaction)
+            {
+                this._command.Transaction = this._transaction;
+            }
         }
     }
 }

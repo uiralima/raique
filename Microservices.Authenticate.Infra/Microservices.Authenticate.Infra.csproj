@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Raique.Microservices.Authenticate.Infra</AssemblyName>
+    <RootNamespace>Raique.Microservices.Authenticate.Infra</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Database.SqlServer\Database.SqlServer.csproj" />
+    <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\Microservices.Authenticate\Microservices.Authenticate.csproj" />
+  </ItemGroup>
+
+</Project>

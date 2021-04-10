@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace Raique.Database.Contracts
 {
@@ -11,8 +12,12 @@ namespace Raique.Database.Contracts
         ISession AddParameter(string name, object value);
         ISession ClearParameters();
         DbDataReader ExecuteReader(bool startTransaction);
-        int ExecuteNonQuery(bool startTransaction);
         DbDataReader ExecuteReader();
+        Task<DbDataReader> ExecuteReaderAsync(bool startTransaction);
+        Task<DbDataReader> ExecuteReaderAsync();
+        int ExecuteNonQuery(bool startTransaction);
+        Task<int> ExecuteNonQueryAsync(bool startTransaction);
+        Task<int> ExecuteNonQueryAsync();
         int ExecuteNonQuery();
     }
 }
