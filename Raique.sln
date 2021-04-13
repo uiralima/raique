@@ -15,11 +15,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "Database\Databa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database.SqlServer", "Database.SqlServer\Database.SqlServer.csproj", "{56F7D2E6-742B-4727-A6D8-D947E4485AD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microservices.Authenticate.Infra", "Microservices.Authenticate.Infra\Microservices.Authenticate.Infra.csproj", "{DA4C3629-676B-4F77-B612-5E77DD2BB448}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microservices.Authenticate.Infra", "Microservices.Authenticate.Infra\Microservices.Authenticate.Infra.csproj", "{DA4C3629-676B-4F77-B612-5E77DD2BB448}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{043CEA72-B2BF-4016-8DAA-83435F9E8C55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microservices.Authenticate.Infra.SqlServer.Setup", "Microservices.Authenticate.Infra.SqlServer.Setup\Microservices.Authenticate.Infra.SqlServer.Setup.csproj", "{8CA64C25-4993-4024-B22C-0B2B8BA4DCF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microservices.Authenticate.Infra.SqlServer.Setup", "Microservices.Authenticate.Infra.SqlServer.Setup\Microservices.Authenticate.Infra.SqlServer.Setup.csproj", "{8CA64C25-4993-4024-B22C-0B2B8BA4DCF4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection", "DependencyInjection\DependencyInjection.csproj", "{1D3BF111-E692-474C-AE07-3C6E92F29954}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionTests", "DependencyInjectionTests\DependencyInjectionTests.csproj", "{5B33B3D1-C419-4527-8579-10E83AF2B543}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,14 @@ Global
 		{8CA64C25-4993-4024-B22C-0B2B8BA4DCF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CA64C25-4993-4024-B22C-0B2B8BA4DCF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CA64C25-4993-4024-B22C-0B2B8BA4DCF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D3BF111-E692-474C-AE07-3C6E92F29954}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D3BF111-E692-474C-AE07-3C6E92F29954}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D3BF111-E692-474C-AE07-3C6E92F29954}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D3BF111-E692-474C-AE07-3C6E92F29954}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B33B3D1-C419-4527-8579-10E83AF2B543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B33B3D1-C419-4527-8579-10E83AF2B543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B33B3D1-C419-4527-8579-10E83AF2B543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B33B3D1-C419-4527-8579-10E83AF2B543}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
