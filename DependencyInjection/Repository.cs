@@ -9,16 +9,16 @@ namespace Raique.DependencyInjection
         private static readonly Dictionary<string, List<Type>> _resource = new Dictionary<string, List<Type>>();
 
         private static object _lockPreference = new object();
-        private static readonly Dictionary<string, Type> _preference = new Dictionary<string, Type>();
+        private static ListRepository _preferenceRepository = new ListRepository();
 
         private static object _lockTransientTypes = new object();
-        private static readonly Dictionary<string, Type> _transientTypes = new Dictionary<string, Type>();
-
-        private static object _lockContextPreferences = new object();
-        private static readonly Dictionary<string, Dictionary<string, Type>> _contextPreference = new Dictionary<string, Dictionary<string, Type>>();
+        private static ExclusiveRepository _transientRepository = new ExclusiveRepository(Repository.ThrowIfTypeAlreadRegistred);
 
         private static object _lockSingletonTypes = new object();
-        private static readonly Dictionary<string, Type> _singletonTypes = new Dictionary<string, Type>();
+        private static ExclusiveRepository _singletonRepository = new ExclusiveRepository(Repository.ThrowIfTypeAlreadRegistred);
+
+        private static object _lockContextPreferences = new object();
+        private static ContextListRepository _contextPreferenceRepository = new ContextListRepository();
 
         private static object _lockInstances = new object();
         private static readonly Dictionary<string, Dictionary<string, object>> _instances = new Dictionary<string, Dictionary<string, object>>();
@@ -26,12 +26,25 @@ namespace Raique.DependencyInjection
         public static void Clear()
         {
             _resource.Clear();
-            _preference.Clear();
-            _transientTypes.Clear();
-            _contextPreference.Clear();
-            _singletonTypes.Clear();
+            lock(_preferenceRepository)
+            {
+                _preferenceRepository.Clear();
+            }
+            lock (_lockTransientTypes)
+            {
+                _transientRepository.Clear();
+            }
+            lock(_lockContextPreferences)
+            {
+                _contextPreferenceRepository.Clear();
+            }
+            lock (_lockSingletonTypes)
+            {
+                _singletonRepository.Clear();
+            }
             _instances.Clear();
         }
+
         public static void AddPath(string path, string pattern = null)
         {
             lock (_lockResource)
@@ -40,40 +53,34 @@ namespace Raique.DependencyInjection
             }
         }
 
-        public static void SetPreference<T>(Type preferedType)
+        public static void SetPreferenceInContext<T, W>(string context)
         {
-            string typeName = typeof(T).FullName;
+            lock (_lockContextPreferences)
+            {
+                _contextPreferenceRepository.SetType<T, W>(context);
+            }
+        }
+
+        public static void SetPreference<T, W>()
+        {
             lock (_lockPreference)
             {
-                if (_preference.ContainsKey(typeName))
-                {
-                    _preference[typeName] = preferedType;
-                }
-                else
-                {
-                    _preference.Add(typeName, preferedType);
-                }
+                _preferenceRepository.SetType<T, W>();
             }
         }
 
         public static void SetTransiente<T, W>()
         {
-            var transientType = typeof(T);
-            var implementation = typeof(W);
             lock (_lockTransientTypes)
             {
-                ThrowIfTypeAlreadRegistred(transientType);
-                _transientTypes.Add(transientType.FullName, implementation);
+                _transientRepository.SetType<T, W>();
             }
         }
         public static void SetSingleton<T, W>()
         {
-            var transientType = typeof(T);
-            var implementation = typeof(W);
-            lock (_lockTransientTypes)
+            lock (_lockSingletonTypes)
             {
-                ThrowIfTypeAlreadRegistred(transientType);
-                _singletonTypes.Add(transientType.FullName, implementation);
+                _singletonRepository.SetType<T, W>();
             }
         }
 
@@ -85,59 +92,52 @@ namespace Raique.DependencyInjection
 
         private static void ThrowIfTypeAlreadSingletonException(Type type)
         {
-            if (IsTypeSingleton(type))
+            if (_singletonRepository.IsTypeRegistred(type))
             {
                 throw Exception.TypeAlreadSingletonException.CreateToType(type.FullName);
             }
         }
+
         private static void ThrowIfTypeAlreadTransientException(Type type)
         {
-            if (IsTypeTransiente(type))
+            if (_transientRepository.IsTypeRegistred(type))
             {
                 throw Exception.TypeAlreadTransientException.CreateToType(type.FullName);
             }
         }
 
-        private static bool IsTypeTransiente(Type type)
+        public static object CreateInstance(string typename)
         {
-            return IsTypeTransiente(type.FullName);
-        }
-        private static bool IsTypeTransiente(string typeFullname)
-        {
-            return _transientTypes.ContainsKey(typeFullname);
+            return CreateInstanceInContext(typename, null);
         }
 
-        private static bool IsTypeSingleton(Type type)
+        public static T CreateInstance<T>() where T : class
         {
-            return IsTypeSingleton(type.FullName);
+            string typename = typeof(T).FullName;
+            return (T)CreateInstanceInContext(typename, null);
         }
 
-        private static bool IsTypeSingleton(string typeFullname)
+        public static T CreateInstanceInContext<T>(string context) where T : class
         {
-            return _singletonTypes.ContainsKey(typeFullname);
+            string typename = typeof(T).FullName;
+            return (T)CreateInstanceInContext(typename, context);
         }
 
-        public static void SetPreferenceInContext<T>(Type preferedType, string context)
+        public static object CreateInstanceInContext(string typename, string context)
         {
-            string typeName = typeof(T).FullName;
-            lock (_lockContextPreferences)
+            Type type = GetType(typename, context);
+            if (_singletonRepository.IsTypeRegistred(typename))
             {
-                if (_contextPreference.ContainsKey(typeName))
+                if (!IsTypeInCache(type, context))
                 {
-                    if (_contextPreference[typeName].ContainsKey(context))
-                    {
-                        _contextPreference[typeName][context] = preferedType;
-                    }
-                    else
-                    {
-                        _contextPreference[typeName].Add(context, preferedType);
-                    }
+                    var instance = CreateType(type, context);
+                    AddTypeInCanche(type, context, instance);
                 }
-                else
-                {
-                    _contextPreference.Add(typeName, new Dictionary<string, Type>());
-                    _contextPreference[typeName].Add(context, preferedType);
-                }
+                return GetTypeInCache(type, context);
+            }
+            else
+            {
+                return CreateType(type, context);
             }
         }
 
@@ -151,37 +151,6 @@ namespace Raique.DependencyInjection
                 p.Add(CreateInstanceInContext(parameter.ParameterType.FullName, context));
             }
             return constructor.Invoke(p.ToArray());
-        }
-        public static object CreateInstance(string typename)
-        {
-            return CreateInstanceInContext(typename, null);
-        }
-        public static T CreateInstance<T>() where T : class
-        {
-            string typename = typeof(T).FullName;
-            return (T)CreateInstanceInContext(typename, null);
-        }
-        public static T CreateInstanceInContext<T>(string context) where T : class
-        {
-            string typename = typeof(T).FullName;
-            return (T)CreateInstanceInContext(typename, context);
-        }
-        public static object CreateInstanceInContext(string typename, string context)
-        {
-            Type type = GetType(typename, context);
-            if (IsTypeSingleton(typename))
-            {
-                if (!IsTypeInCache(type, context))
-                {
-                    var instance = CreateType(type, context);
-                    AddTypeInCanche(type, context, instance);
-                }
-                return GetTypeInCache(type, context);
-            }
-            else
-            {
-                return CreateType(type, context);
-            }
         }
 
         private static bool IsTypeInCache(Type type, string context)
@@ -227,22 +196,22 @@ namespace Raique.DependencyInjection
         {
             if (!string.IsNullOrWhiteSpace(context))
             {
-                if ((_contextPreference.ContainsKey(typeName)) && (_contextPreference[typeName].ContainsKey(context)))
+                if (_contextPreferenceRepository.IsTypeRegistred(typeName, context))
                 {
-                    return _contextPreference[typeName][context];
+                    return _contextPreferenceRepository.GetType(typeName, context);
                 }
             }
-            if (_preference.ContainsKey(typeName))
+            if (_preferenceRepository.IsTypeRegistred(typeName))
             {
-                return _preference[typeName];
+                return _preferenceRepository.GetType(typeName);
             }
-            if (IsTypeTransiente(typeName))
+            if (_transientRepository.IsTypeRegistred(typeName))
             {
-                return _transientTypes[typeName];
+                return _transientRepository.GetType(typeName);
             }
-            if (IsTypeSingleton(typeName))
+            if (_singletonRepository.IsTypeRegistred(typeName))
             {
-                return _singletonTypes[typeName];
+                return _singletonRepository.GetType(typeName);
             }
             if (_resource.ContainsKey(typeName))
             {

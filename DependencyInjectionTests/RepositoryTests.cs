@@ -182,7 +182,34 @@ namespace Raique.DependencyInjection.Tests
         #endregion
 
         #region Set Preference
-        //TODO: Testar SetPreference e SetPreferenceInContext 
+        [TestMethod()]
+        public void SetPreferenceTest()
+        {
+            Repository.Clear();
+            Repository.SetTransiente<ITestInterface, TestType1>();
+            Repository.SetTransiente<IInjectedType, InjectedType>();
+            Repository.SetPreference<ITestInterface, TestType2>();
+            var aux = Repository.CreateInstance<ITestInterface>();
+            Assert.AreEqual(typeof(TestType2).FullName, aux.GetType().FullName);
+        }
+
+        #endregion
+
+        #region Set PreferenceInContext
+
+        [TestMethod()]
+        public void SetPreferenceInContextTest()
+        {
+            Repository.Clear();
+            Repository.SetTransiente<IInjectedType, InjectedType>();
+            Repository.SetPreference<ITestInterface, TestType2>();
+            Repository.SetPreferenceInContext<ITestInterface, TestType1>("1");
+            Repository.SetPreferenceInContext<ITestInterface, TestType2>("2");
+            var aux = Repository.CreateInstanceInContext<ITestInterface>("1");
+            Assert.AreEqual(typeof(TestType1).FullName, aux.GetType().FullName);
+            aux = Repository.CreateInstanceInContext<ITestInterface>("2");
+            Assert.AreEqual(typeof(TestType2).FullName, aux.GetType().FullName);
+        }
 
         #endregion
     }
