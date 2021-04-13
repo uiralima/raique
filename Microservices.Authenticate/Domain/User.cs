@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Raique.Microservices.Authenticate.Domain
+﻿namespace Raique.Microservices.Authenticate.Domain
 {
     public class User : Base
     {
