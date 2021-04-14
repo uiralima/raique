@@ -10,7 +10,7 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer.Setup.Implementation
         public override string CreateTableQuery =>
             @"
                 CREATE TABLE [dbo].[User](
-	                [UserId] [int] NOT NULL,
+	                [UserId] [int] IDENTITY(1,1) NOT NULL,
 	                [Key] [varchar](128) NOT NULL,
 	                [Password] [varchar](128) NOT NULL,
 	                [CheckKey] [varchar](128) NOT NULL,
@@ -28,6 +28,7 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer.Setup.Implementation
                 GO
 
                 ALTER TABLE [dbo].[User] CHECK CONSTRAINT [FK_User_App]
+                GO
              ";
 
         public override string TableName => "User";

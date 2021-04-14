@@ -20,8 +20,8 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer.Setup
             foreach(var creator in creators)
             {
                 Console.WriteLine($"Criando tabela {creator.TableName}...");
-                await creator.Create();
-                Console.WriteLine($"Tabela {creator.TableName} criada!");
+                bool create = await creator.Create();
+                Console.WriteLine($"Tabela {creator.TableName} {(create ? "criada" : "já existe")}!");
             }
         }
 

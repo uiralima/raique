@@ -15,27 +15,49 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer.Setup.Contracts
 
         public abstract string TableName { get; }
 
-        public async Task Create()
+        public async Task<bool> Create()
         {
-            bool createTransaction = true;
-            var commands = SepareCommand(CreateTableQuery);
-            using(var session = CreateSession())
+            if (!await TableExists())
             {
-                foreach (var command in commands)
+                bool createTransaction = true;
+                var commands = SepareCommand(CreateTableQuery);
+                using (var session = CreateSession())
                 {
-                    session.SetQuery(PutCommandInsideIf(command));
-                    await session.ExecuteNonQueryAsync(createTransaction);
-                    createTransaction = false;
+                    foreach (var command in commands)
+                    {
+                        session.SetQuery(command);
+                        await session.ExecuteNonQueryAsync(createTransaction);
+                        createTransaction = false;
+                    }
                 }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
         private IEnumerable<string> SepareCommand(string command) => command.Split("GO").Where(f => !string.IsNullOrWhiteSpace(f));
 
-        private string PutCommandInsideIf(string command) =>
-           String.Format(@"IF  NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{0}]') AND type in (N'U'))
+        private async Task<bool> TableExists()
+        {
+            string query = String.Format(@"IF  NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{0}]') AND type in (N'U'))
                     BEGIN 
-                        {1}
-                    END", TableName, command);
+                        SELECT CAST(0 AS BIT)
+                    END
+                    ELSE
+                    BEGIN
+                        SELECT CAST(1 AS BIT)
+                    END", TableName);
+            using(var session = CreateSession())
+            {
+                session.SetQuery(query);
+                using(var reader = await session.ExecuteReaderAsync())
+                {
+                    return ((reader.Read()) && (reader.GetBoolean(0)));
+                }
+            }
+        }
     }
 }
