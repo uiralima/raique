@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.Infra.SqlServer
 {
-    public class AppRepossitoryImpl : Raique.Database.SqlServer.Contracts.Base, Raique.Microservices.Authenticate.Protocols.IAppRepository
+    public class AppRepossitoryImpl : Raique.Database.SqlServer.Contracts.Base, 
+        Raique.Microservices.Authenticate.Protocols.IAppRepository
     {
         public AppRepossitoryImpl(IDatabaseConfig config) : base(config)
         {

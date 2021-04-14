@@ -30,7 +30,6 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
                 int id = db.Count + 2;
                 db.Add(new App
                 {
-                    AppId = id,
                     Key = key,
                     Name = name
                 });
@@ -68,7 +67,6 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
                 {
                     return new App
                     {
-                        AppId = 1,
                         Key = "Chave",
                         Name = "Mock"
                     };
