@@ -7,6 +7,5 @@
         string Database { get; }
         string UserName { get; }
         string Password { get; }
-
     }
 }
