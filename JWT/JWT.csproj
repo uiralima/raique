@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Raique.Database.SqlServer</AssemblyName>
-    <RootNamespace>Raique.Database.SqlServer</RootNamespace>
+    <AssemblyName>Raique.JWT</AssemblyName>
+    <RootNamespace>Raique.JWT</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,11 +15,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\Microservices.Authenticate\Microservices.Authenticate.csproj" />
   </ItemGroup>
 
 </Project>

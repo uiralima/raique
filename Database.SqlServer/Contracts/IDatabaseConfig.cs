@@ -2,11 +2,11 @@
 {
     public interface IDatabaseConfig
     {
-        public string Server { get; }
-        public string Port { get; }
-        public string Database { get; }
-        public string UserName { get; }
-        public string Password { get; }
+        string Server { get; }
+        string Port { get; }
+        string Database { get; }
+        string UserName { get; }
+        string Password { get; }
 
     }
 }
