@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Raique.Common.HTTP.AspNetCore</AssemblyName>
+    <RootNamespace>Raique.Common.HTTP.AspNetCore</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>D:\Desenvolvimento\dotnet\Raique\Build\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>D:\Desenvolvimento\dotnet\Raique\Build\</OutputPath>
+  </PropertyGroup>
+
+</Project>
