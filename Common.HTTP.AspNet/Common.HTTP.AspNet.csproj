@@ -59,6 +59,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Commom.Controller\Common.Controller.csproj">
+      <Project>{55733570-968b-4fbe-8989-970e32e93144}</Project>
+      <Name>Common.Controller</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.HTTP\Common.HTTP.csproj">
       <Project>{ECC178CD-A336-44FF-825F-1D4B8BAEED77}</Project>
       <Name>Common.HTTP</Name>

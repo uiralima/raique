@@ -41,34 +41,34 @@ namespace Raique.Common.HTTP.Hooks
 
         private void ReadDevice()
         {
-            Device = ReadHeader(DeviceHeader);
-            UninformedDeviceException.Creator.ThrowIfTrue((_controller.DeviceRequired) && (String.IsNullOrWhiteSpace(Device)));
+            _controller.Device = ReadHeader(DeviceHeader);
+            UninformedDeviceException.Creator.ThrowIfTrue((_controller.DeviceRequired) && (String.IsNullOrWhiteSpace(_controller.Device)));
         }
 
         private void ReadApp()
         {
-            App = ReadHeader(AppHeader);
-            UninformedAppException.Creator.ThrowIfTrue((_controller.AppRequired) && (String.IsNullOrWhiteSpace(App)));
+            _controller.AppKey = ReadHeader(AppHeader);
+            UninformedAppException.Creator.ThrowIfTrue((_controller.AppRequired) && (String.IsNullOrWhiteSpace(_controller.AppKey)));
         }
 
         private async Task ReadUser()
         {
-            CurrentUser = CreateInvalidUser();
+            _controller.CurrentUser = CreateInvalidUser();
             string token = ReadHeader(TokenHeader);
             if (!string.IsNullOrWhiteSpace(token))
             {
                 await ReadUserByTokenFromRepository(token);
             }
-            InvalidUserException.Creator.ThrowIfTrue((_controller.UserRequired) && (!CurrentUser.IsValid()));
+            InvalidUserException.Creator.ThrowIfTrue((_controller.UserRequired) && (!_controller.CurrentUser.IsValid()));
         }
 
         private async Task ReadUserByTokenFromRepository(string token)
         {
-            var userId = await _tokenRepository.GetUserIdByToken(Device, token);
+            var userId = await _tokenRepository.GetUserIdByToken(_controller.Device, token);
             if (userId > 0)
             {
-                CurrentUser = await _userRepository.GetById(userId);
-                CurrentUser.ClearSecurityInfo();
+                _controller.CurrentUser = await _userRepository.GetById(userId);
+                _controller.CurrentUser.ClearSecurityInfo();
             }
         }
 
@@ -91,12 +91,6 @@ namespace Raique.Common.HTTP.Hooks
             return _message.Headers.Any(f => f.Key == headerName) ?
                 _message.Headers.Where(f => f.Key == headerName).First().Value.First() : String.Empty;
         }
-
-        protected string Device { get; private set; }
-
-        protected string App { get; private set; }
-
-        protected User CurrentUser { get; private set; }
 
         protected virtual string DeviceHeader => "rqe_device";
 

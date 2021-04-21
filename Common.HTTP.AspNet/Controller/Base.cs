@@ -1,4 +1,5 @@
 ﻿using Raique.Common.HTTP.Hooks;
+using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Protocols;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -10,15 +11,31 @@ namespace Raique.Common.HTTP.AspNet.Controller
     [AppActionFilter]
     public abstract class Base : System.Web.Http.ApiController, IActionController, IController
     {
-        protected Base()
-        {
-            
-        }
+        private readonly Common.Controller.IController _logicalController;
 
+        protected Base(Common.Controller.IController logicalController)
+        {
+            _logicalController = logicalController;
+        }
+        protected Common.Controller.IController LogicalController => _logicalController;
         public abstract bool DeviceRequired { get; }
         public abstract bool AppRequired { get; }
         public abstract bool UserRequired { get; }
-
+        public string AppKey 
+        {
+            get => _logicalController.AppKey;
+            set => _logicalController.AppKey = value;
+        }
+        public string Device 
+        {
+            get => _logicalController.Device;
+            set => _logicalController.Device = value;
+        }
+        public User CurrentUser 
+        {
+            get => _logicalController.CurrentUser;
+            set => _logicalController.CurrentUser = value;
+        }
         [NonAction]
         public async Task DoActionExecuted(HttpActionExecutedContext context)
         {

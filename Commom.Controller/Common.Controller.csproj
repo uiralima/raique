@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Raique.Commom.Controller</AssemblyName>
-    <RootNamespace>Raique.Commom.Controller</RootNamespace>
+    <AssemblyName>Raique.Common.Controller</AssemblyName>
+    <RootNamespace>Raique.Common.Controller</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,5 +13,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>D:\Desenvolvimento\dotnet\Raique\Build\</OutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Microservices.Authenticate\Microservices.Authenticate.csproj" />
+  </ItemGroup>
 
 </Project>
