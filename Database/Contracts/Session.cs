@@ -121,17 +121,17 @@ namespace Raique.Database.Contracts
             return ExecuteNonQuery(true);
         }
 
-        public virtual Task<int> ExecuteNonQueryAsync()
+        public virtual async Task<int> ExecuteNonQueryAsync()
         {
-            return ExecuteNonQueryAsync(true);
+            return await ExecuteNonQueryAsync(true);
         }
 
-        public virtual Task<int> ExecuteNonQueryAsync(bool startTransaction)
+        public virtual async Task<int> ExecuteNonQueryAsync(bool startTransaction)
         {
             PrepareToExecute(startTransaction);
             try
             {
-                return this._command.ExecuteNonQueryAsync();
+                return await this._command.ExecuteNonQueryAsync().ConfigureAwait(false); 
             }
             catch (Exception ex)
             {
@@ -140,17 +140,17 @@ namespace Raique.Database.Contracts
             }
         }
 
-        public virtual Task<DbDataReader> ExecuteReaderAsync()
+        public virtual async Task<DbDataReader> ExecuteReaderAsync()
         {
-            return ExecuteReaderAsync(true);
+            return await ExecuteReaderAsync(true);
         }
 
-        public virtual Task<DbDataReader> ExecuteReaderAsync(bool startTransaction)
+        public virtual async Task<DbDataReader> ExecuteReaderAsync(bool startTransaction)
         {
             PrepareToExecute(startTransaction);
             try
             {
-                return this._command.ExecuteReaderAsync();
+                return await this._command.ExecuteReaderAsync().ConfigureAwait(false); 
             }
             catch (Exception ex)
             {

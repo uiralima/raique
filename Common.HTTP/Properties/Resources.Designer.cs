@@ -61,20 +61,29 @@ namespace Raique.Common.HTTP.Properties {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Usuário inválido!.
+        /// </summary>
+        internal static string InvalidUserException {
+            get {
+                return ResourceManager.GetString("InvalidUserException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Aplicativo não informado!.
         /// </summary>
-        internal static string UninformedAppMessage {
+        internal static string UninformedAppException {
             get {
-                return ResourceManager.GetString("UninformedAppMessage", resourceCulture);
+                return ResourceManager.GetString("UninformedAppException", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Dispositivo não informado!.
         /// </summary>
-        internal static string UninformedDeviceMessage {
+        internal static string UninformedDeviceException {
             get {
-                return ResourceManager.GetString("UninformedDeviceMessage", resourceCulture);
+                return ResourceManager.GetString("UninformedDeviceException", resourceCulture);
             }
         }
     }

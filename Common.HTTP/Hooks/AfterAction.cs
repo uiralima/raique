@@ -40,9 +40,14 @@ namespace Raique.Common.HTTP.Hooks
         private void CreateReponseAndClearException(HttpStatusCode statusCode, string code)
         {
             _message.CreateResponse(statusCode, $"{_message.Exception.Message} ({code})");
-            Log($"Erro de permissão - {_message.Exception.ToString()} ({code})");
+            Log($"{LogIdentifierByStatusCode(statusCode)} - {_message.Exception.ToString()} ({code})");
             _message.ClearException();
         }
+
+        private string LogIdentifierByStatusCode(HttpStatusCode statusCode) => 
+            (statusCode == HttpStatusCode.BadRequest) ? 
+            "Erro de Negócio" : (statusCode == HttpStatusCode.Forbidden) ? 
+            "Erro de permissão" : "Erro Interno";
 
         private void Log(string message)
         {

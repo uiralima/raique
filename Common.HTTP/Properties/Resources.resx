@@ -117,10 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="UninformedAppMessage" xml:space="preserve">
+  <data name="InvalidUserException" xml:space="preserve">
+    <value>Usuário inválido!</value>
+  </data>
+  <data name="UninformedAppException" xml:space="preserve">
     <value>Aplicativo não informado!</value>
   </data>
-  <data name="UninformedDeviceMessage" xml:space="preserve">
+  <data name="UninformedDeviceException" xml:space="preserve">
     <value>Dispositivo não informado!</value>
   </data>
 </root>

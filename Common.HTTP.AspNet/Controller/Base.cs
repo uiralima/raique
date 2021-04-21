@@ -8,12 +8,16 @@ using System.Web.Http.Filters;
 namespace Raique.Common.HTTP.AspNet.Controller
 {
     [AppActionFilter]
-    public abstract class Base : System.Web.Http.ApiController, IActionController
+    public abstract class Base : System.Web.Http.ApiController, IActionController, IController
     {
         protected Base()
         {
             
         }
+
+        public abstract bool DeviceRequired { get; }
+        public abstract bool AppRequired { get; }
+        public abstract bool UserRequired { get; }
 
         [NonAction]
         public async Task DoActionExecuted(HttpActionExecutedContext context)
@@ -26,6 +30,7 @@ namespace Raique.Common.HTTP.AspNet.Controller
         public async Task DoActionExecuting(HttpActionContext actionContext)
         {
             BeforeAction beforeAction = new BeforeAction(
+                this,
                 HttpBeforeActionMessage.CreateFromContext(actionContext),
                 DependencyInjection.Repository.CreateInstance<ITokenRepository>(), 
                 DependencyInjection.Repository.CreateInstance<IUserRepository>());

@@ -1,9 +1,11 @@
-﻿using Raique.Microservices.Authenticate.Domain;
+﻿using Raique.Common.HTTP.Hooks.Exceptions;
+using Raique.Core.Exceptions;
+using Raique.Library;
+using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Protocols;
 using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Raique.Common.HTTP.Hooks
@@ -13,9 +15,11 @@ namespace Raique.Common.HTTP.Hooks
         private readonly IBeforeActionMessage _message;
         private readonly IUserRepository _userRepository;
         private readonly ITokenRepository _tokenRepository;
+        private readonly IController _controller;
 
-        public BeforeAction(IBeforeActionMessage message, ITokenRepository tokenRepository, IUserRepository userRepository)
+        public BeforeAction(IController controller, IBeforeActionMessage message, ITokenRepository tokenRepository, IUserRepository userRepository)
         {
+            _controller = controller;
             _message = message;
             _userRepository = userRepository;
             _tokenRepository = tokenRepository;
@@ -25,34 +29,60 @@ namespace Raique.Common.HTTP.Hooks
         {
             try
             {
-                Device = ReadHeader(DeviceHeader);
-                if (String.IsNullOrWhiteSpace(Device))
-                {
-                    SendBadRequestResponse(Properties.Resources.UninformedDeviceMessage);
-                }
-                else
-                {
-                    App = ReadHeader(AppHeader);
-                    if (String.IsNullOrWhiteSpace(App))
-                    {
-                        SendBadRequestResponse(Properties.Resources.UninformedAppMessage);
-                    }
-                    else
-                    {
-                        CurrentUser = null;
-                        string token = ReadHeader(TokenHeader);
-                        if (!string.IsNullOrWhiteSpace(token))
-                        {
-                            var userId = await _tokenRepository.GetUserIdByToken(Device, token);
-                            CurrentUser = await _userRepository.GetById(userId);
-                            CurrentUser.ClearSecurityInfo();
-                        }
-                    }
-                }
+                ReadDevice();
+                ReadApp();
+                await ReadUser();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                SendInternalServerErrorResponse(ex);
+                CreateResponseFromException(ex);
+            }
+        }
+
+        private void ReadDevice()
+        {
+            Device = ReadHeader(DeviceHeader);
+            UninformedDeviceException.Creator.ThrowIfTrue((_controller.DeviceRequired) && (String.IsNullOrWhiteSpace(Device)));
+        }
+
+        private void ReadApp()
+        {
+            App = ReadHeader(AppHeader);
+            UninformedAppException.Creator.ThrowIfTrue((_controller.AppRequired) && (String.IsNullOrWhiteSpace(App)));
+        }
+
+        private async Task ReadUser()
+        {
+            CurrentUser = CreateInvalidUser();
+            string token = ReadHeader(TokenHeader);
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                await ReadUserByTokenFromRepository(token);
+            }
+            InvalidUserException.Creator.ThrowIfTrue((_controller.UserRequired) && (!CurrentUser.IsValid()));
+        }
+
+        private async Task ReadUserByTokenFromRepository(string token)
+        {
+            var userId = await _tokenRepository.GetUserIdByToken(Device, token);
+            if (userId > 0)
+            {
+                CurrentUser = await _userRepository.GetById(userId);
+                CurrentUser.ClearSecurityInfo();
+            }
+        }
+
+        private User CreateInvalidUser() => User.Invalid<User>();
+
+        private void CreateResponseFromException(Exception exception)
+        {
+            if (exception is IBusinessException)
+            {
+                SendBadRequestResponse(exception.Message);
+            }
+            else
+            {
+                SendInternalServerErrorResponse(exception);
             }
         }
 
@@ -65,6 +95,8 @@ namespace Raique.Common.HTTP.Hooks
         protected string Device { get; private set; }
 
         protected string App { get; private set; }
+
+        protected User CurrentUser { get; private set; }
 
         protected virtual string DeviceHeader => "rqe_device";
 
@@ -80,7 +112,5 @@ namespace Raique.Common.HTTP.Hooks
         {
             _message.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
         }
-
-        protected User CurrentUser { get; private set; }
     }
 }
