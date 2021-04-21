@@ -7,5 +7,11 @@
         public string Password { get; set; }
         public string CheckKey { get; set; }
         public string AppKey { get; set; }
+
+        public void ClearSecurityInfo()
+        {
+            Password = string.Empty;
+            CheckKey = string.Empty;
+        }
     }
 }

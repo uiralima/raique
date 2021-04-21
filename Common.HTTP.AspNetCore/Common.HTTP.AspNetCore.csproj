@@ -14,4 +14,14 @@
     <OutputPath>D:\Desenvolvimento\dotnet\Raique\Build\</OutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common.HTTP\Common.HTTP.csproj" />
+    <ProjectReference Include="..\DependencyInjection\DependencyInjection.csproj" />
+    <ProjectReference Include="..\Microservices.Authenticate\Microservices.Authenticate.csproj" />
+  </ItemGroup>
+
 </Project>
