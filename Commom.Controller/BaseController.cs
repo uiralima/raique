@@ -10,5 +10,9 @@ namespace Raique.Common.Controller
         public string AppKey { get; set; }
         public string Device { get; set; }
         public User CurrentUser { get; set; }
+        public virtual void Log(string messageToLog)
+        {
+            Common.Log.FileLog.InternalLog.Log(messageToLog);
+        }
     }
 }

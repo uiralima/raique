@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Commom.Controller\Common.Controller.csproj" />
+    <ProjectReference Include="..\Common.Log\Common.Log.csproj" />
     <ProjectReference Include="..\Library\Library.csproj" />
     <ProjectReference Include="..\Microservices.Authenticate\Microservices.Authenticate.csproj" />
   </ItemGroup>

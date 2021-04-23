@@ -11,10 +11,14 @@ namespace Raique.Common.HTTP.AspNet.Controller
     [AppActionFilter]
     public abstract class Base : System.Web.Http.ApiController, IActionController, IController
     {
+        private readonly ITokenRepository _tokenRepository;
+        private readonly IUserRepository _userRepository;
         private readonly Common.Controller.IController _logicalController;
 
-        protected Base(Common.Controller.IController logicalController)
+        protected Base(ITokenRepository tokenRepository, IUserRepository userRepository, Common.Controller.IController logicalController)
         {
+            _tokenRepository = tokenRepository;
+            _userRepository = userRepository;
             _logicalController = logicalController;
         }
         protected Common.Controller.IController LogicalController => _logicalController;
@@ -49,8 +53,8 @@ namespace Raique.Common.HTTP.AspNet.Controller
             BeforeAction beforeAction = new BeforeAction(
                 this,
                 HttpBeforeActionMessage.CreateFromContext(actionContext),
-                DependencyInjection.Repository.CreateInstance<ITokenRepository>(), 
-                DependencyInjection.Repository.CreateInstance<IUserRepository>());
+                _tokenRepository, 
+                _userRepository);
             await beforeAction.Execute();
         }
     }

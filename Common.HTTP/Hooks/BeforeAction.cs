@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Raique.Common.HTTP.Hooks
 {
-    public class BeforeAction
+    public class BeforeAction : BaseAction
     {
         private readonly IBeforeActionMessage _message;
         private readonly IUserRepository _userRepository;
@@ -35,6 +35,7 @@ namespace Raique.Common.HTTP.Hooks
             }
             catch (Exception ex)
             {
+                LogException(HttpStatusCode.InternalServerError, GenerateLogCode(), ex);
                 CreateResponseFromException(ex);
             }
         }

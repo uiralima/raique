@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Threading.Tasks;
 
 namespace Raique.Common.HTTP.Hooks
 {
-    public class AfterAction
+    public class AfterAction : BaseAction
     {
         private readonly IAfterActionMessage _message;
 
@@ -20,8 +18,8 @@ namespace Raique.Common.HTTP.Hooks
             {
                 if (_message.Exception != null)
                 {
-                    string code = Raique.Library.StringUtilities.GenerateRandom(7, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-                    if (_message.Exception is Raique.Core.Exceptions.IBusinessException)
+                    string code = GenerateLogCode();
+                    if (_message.Exception is Core.Exceptions.IBusinessException)
                     {
                         CreateReponseAndClearException(HttpStatusCode.BadRequest, code);
                     }
@@ -40,18 +38,12 @@ namespace Raique.Common.HTTP.Hooks
         private void CreateReponseAndClearException(HttpStatusCode statusCode, string code)
         {
             _message.CreateResponse(statusCode, $"{_message.Exception.Message} ({code})");
-            Log($"{LogIdentifierByStatusCode(statusCode)} - {_message.Exception.ToString()} ({code})");
+            LogException(statusCode, code, _message.Exception);
             _message.ClearException();
         }
 
-        private string LogIdentifierByStatusCode(HttpStatusCode statusCode) => 
-            (statusCode == HttpStatusCode.BadRequest) ? 
-            "Erro de Negócio" : (statusCode == HttpStatusCode.Forbidden) ? 
-            "Erro de permissão" : "Erro Interno";
+        
 
-        private void Log(string message)
-        {
-            
-        }
+        
     }
 }
