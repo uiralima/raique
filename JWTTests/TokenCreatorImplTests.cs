@@ -16,7 +16,7 @@ namespace Raique.JWT.Tests
         {
             try
             {
-                TokenCreatorImpl impl = new TokenCreatorImpl(new JWTConfigMock(), new LoadRolesMock());
+                TokenCreatorImpl impl = new TokenCreatorImpl(new JWTConfigMock());
                 User user = new User
                 {
                     UserId = 1,
