@@ -23,7 +23,7 @@ namespace Raique.JWT.Tests
                     Key = "User",
                     AppKey = "App"
                 };
-                string token = impl.Create(user);
+                string token = impl.Create(user, "device", "appKey");
             }
             catch
             {

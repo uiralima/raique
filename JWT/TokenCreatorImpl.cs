@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Raique.JWT.Protocols;
+using Raique.Library;
 using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Protocols;
 using System;
@@ -18,17 +19,19 @@ namespace Raique.JWT
         {
             _jWTConfig = jWTConfig;
         }
-        public string Create(User user)
+        public string Create(User user, string device, string appkey)
         {
             byte[] key = Convert.FromBase64String(_jWTConfig.Secret);
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
             ClaimsIdentity identity;
             identity = new ClaimsIdentity(new GenericIdentity(user.Key, "Login"));
-            //Dictionary<string, object> otherClaims = new Dictionary<string, object>();
-            //otherClaims.Add("MyUser", user);
+            Dictionary<string, object> otherClaims = new Dictionary<string, object>();
+            otherClaims.Add("MyUser", user.ToJson());
+            otherClaims.Add("Device", device);
+            otherClaims.Add("App", appkey);
             SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
             {
-                //Claims = otherClaims,
+                Claims = otherClaims,
                 NotBefore = Raique.Library.DateUtilities.Now,
                 Subject = identity,
                 SigningCredentials = new SigningCredentials(securityKey,

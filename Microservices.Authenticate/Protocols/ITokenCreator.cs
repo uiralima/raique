@@ -4,6 +4,6 @@ namespace Raique.Microservices.Authenticate.Protocols
 {
     public interface ITokenCreator
     {
-        string Create(User user);
+        string Create(User user, string device, string appkey);
     }
 }

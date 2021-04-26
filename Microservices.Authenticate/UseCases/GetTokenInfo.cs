@@ -14,12 +14,13 @@ namespace Raique.Microservices.Authenticate.UseCases
         private readonly string _appKey;
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ITokenInfoExtractor _tokenInfoExtractor;
         private readonly Func<Exception> InvalidTokenExceptionCreator;
 
-        public static async Task<User> Execute(ITokenRepository tokenRepository, IUserRepository userRepository,
+        public static async Task<User> Execute(ITokenRepository tokenRepository, IUserRepository userRepository, ITokenInfoExtractor tokenInfoExtractor,
             string token, string appKey, string device) =>
-            await new GetTokenInfo(tokenRepository, userRepository, token, appKey, device).Do();
-        private GetTokenInfo(ITokenRepository tokenRepository, IUserRepository userRepository,
+            await new GetTokenInfo(tokenRepository, userRepository, tokenInfoExtractor, token, appKey, device).Do();
+        private GetTokenInfo(ITokenRepository tokenRepository, IUserRepository userRepository, ITokenInfoExtractor tokenInfoExtractor,
             string token, string appKey, string device)
         {
             _device = device;
@@ -27,6 +28,7 @@ namespace Raique.Microservices.Authenticate.UseCases
             _appKey = appKey;
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
+            _tokenInfoExtractor = tokenInfoExtractor;
             ValidateInstance();
             InvalidTokenExceptionCreator = () => InvalidTokenException.Create(_token, _appKey, _device);
         }
@@ -37,12 +39,17 @@ namespace Raique.Microservices.Authenticate.UseCases
             _appKey.ThrowIfIsNullOrEmpty("appKey");
             _tokenRepository.ThrowIfNull("tokenRepository");
             _userRepository.ThrowIfNull("userRepository");
+            _tokenInfoExtractor.ThrowIfNull("tokenInfoExtractor");
         }
 
         private async Task<User> Do()
         {
+            var (tokenUser, device, app) = _tokenInfoExtractor.Extract(_token);
+            InvalidTokenExceptionCreator.ThrowIfTrue((!tokenUser.IsValid()) ||
+                device.CompareTo(_device) != 0 ||
+                app.CompareTo(_appKey) != 0);
             int userId = await _tokenRepository.GetUserIdByToken(_device, _token);
-            InvalidTokenExceptionCreator.ThrowIfTrue(userId <= 0);
+            InvalidTokenExceptionCreator.ThrowIfTrue((userId <= 0) || (userId.CompareTo(tokenUser.UserId) != 0));
             var user = await _userRepository.GetById(userId);
             InvalidTokenExceptionCreator.ThrowIfFalse(user.IsValid());
             InvalidTokenExceptionCreator.ThrowIfFalse(user.AppKey.Equals(_appKey));
