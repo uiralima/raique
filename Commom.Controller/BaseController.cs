@@ -9,6 +9,7 @@ namespace Raique.Common.Controller
         public virtual bool UserRequired => true;
         public string AppKey { get; set; }
         public string Device { get; set; }
+        public string Token { get; set; }
         public User CurrentUser { get; set; }
         public virtual void Log(string messageToLog)
         {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Raique.Common.Controller;
 using Raique.Common.HTTP.Hooks;
 using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Protocols;
@@ -33,6 +34,11 @@ namespace Raique.Common.HTTP.AspNetCore.Controller
         {
             get => _logicalController.Device;
             set => _logicalController.Device = value;
+        }
+        public string Token 
+        {
+            get => _logicalController.Token;
+            set => _logicalController.Token = value;
         }
         public User CurrentUser 
         {

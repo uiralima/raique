@@ -37,7 +37,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.HTTP.AspNet", "Commo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Controller", "Commom.Controller\Common.Controller.csproj", "{55733570-968B-4FBE-8989-970E32E93144}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Log", "Common.Log\Common.Log.csproj", "{4825FC9D-379D-4B7A-A073-AE6791905A59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Log", "Common.Log\Common.Log.csproj", "{4825FC9D-379D-4B7A-A073-AE6791905A59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microservices.Authorization", "Microservices.Authorization\Microservices.Authorization.csproj", "{9149B67F-A154-4411-9E6A-447DE8F7C628}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,10 @@ Global
 		{4825FC9D-379D-4B7A-A073-AE6791905A59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4825FC9D-379D-4B7A-A073-AE6791905A59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4825FC9D-379D-4B7A-A073-AE6791905A59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9149B67F-A154-4411-9E6A-447DE8F7C628}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9149B67F-A154-4411-9E6A-447DE8F7C628}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9149B67F-A154-4411-9E6A-447DE8F7C628}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9149B67F-A154-4411-9E6A-447DE8F7C628}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
-﻿using Raique.Common.HTTP.Hooks.Exceptions;
+﻿using Raique.Common.Controller;
+using Raique.Common.HTTP.Hooks.Exceptions;
 using Raique.Core.Exceptions;
 using Raique.Library;
 using Raique.Microservices.Authenticate.Domain;
@@ -58,6 +59,7 @@ namespace Raique.Common.HTTP.Hooks
             string token = ReadHeader(TokenHeader);
             if (!string.IsNullOrWhiteSpace(token))
             {
+                _controller.Token = token;
                 await ReadUserByTokenFromRepository(token);
             }
             InvalidUserException.Creator.ThrowIfTrue((_controller.UserRequired) && (!_controller.CurrentUser.IsValid()));

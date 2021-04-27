@@ -10,5 +10,6 @@ namespace Raique.Common.Controller
         string AppKey { get; set; }
         string Device { get; set; }
         User CurrentUser { get; set; }
+        string Token { get; set; }
     }
 }

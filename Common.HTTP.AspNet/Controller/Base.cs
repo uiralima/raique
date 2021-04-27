@@ -1,4 +1,5 @@
-﻿using Raique.Common.HTTP.Hooks;
+﻿using Raique.Common.Controller;
+using Raique.Common.HTTP.Hooks;
 using Raique.Microservices.Authenticate.Domain;
 using Raique.Microservices.Authenticate.Protocols;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Raique.Common.HTTP.AspNet.Controller
     {
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
-        private readonly Common.Controller.IController _logicalController;
+        private readonly IController _logicalController;
 
         protected Base(ITokenRepository tokenRepository, IUserRepository userRepository, Common.Controller.IController logicalController)
         {
@@ -34,6 +35,11 @@ namespace Raique.Common.HTTP.AspNet.Controller
         {
             get => _logicalController.Device;
             set => _logicalController.Device = value;
+        }
+        public string Token 
+        {
+            get => _logicalController.Token;
+            set => _logicalController.Token = value;
         }
         public User CurrentUser 
         {
