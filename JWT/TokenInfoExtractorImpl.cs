@@ -48,7 +48,7 @@ namespace Raique.JWT
                         {
                             device = curentClaim.Value;
                         }
-                        else if (curentClaim.Type.CompareTo("MyUser") == 0)
+                        else if (curentClaim.Type.CompareTo("App") == 0)
                         {
                             app = curentClaim.Value;
                         }
