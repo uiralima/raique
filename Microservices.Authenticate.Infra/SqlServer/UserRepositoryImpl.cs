@@ -24,6 +24,46 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer
             }
         }
 
+        public async Task<bool> ChangePasswordByCode(string userName, string code, string password)
+        {
+            string query = @"
+                            DELETE PasswordRecovery WHERE CreatedDate < @limitDate
+                            IF EXISTS(
+                                    SELECT 
+                                        code 
+                                    FROM 
+                                        PasswordRecovery AS pr INNER JOIN
+                                        [User] AS us ON (pr.[UserId] = us.[UserId])
+                                    WHERE
+                                        us.[Key] = @userName AND
+                                        pr.[Code] = @code
+                                )
+                            BEGIN
+                                UPDATE [dbo].[User] SET [Password] = @password WHERE [Key] = @userName
+                                DELETE PasswordRecovery WHERE [Code] = @code
+                                SELECT CAST(1 AS BIT) 
+                            END
+                            ELSE
+                                SELECT CAST(0 AS BIT) 
+                            ";
+            using (var session = CreateSession())
+            {
+                session.SetQuery(query)
+                    .AddParameter("@limitDate", Raique.Library.DateUtilities.Now.AddDays(-2))
+                    .AddParameter("@userName", userName)
+                    .AddParameter("@code", code)
+                    .AddParameter("@password", password);
+                using (var reader = await session.ExecuteReaderAsync())
+                {
+                    if (reader.Read())
+                    {
+                        return reader.GetBoolean(0);
+                    }
+                }
+            }
+            return false;
+        }
+
         public async Task<int> Create(User user)
         {
             string query = @"

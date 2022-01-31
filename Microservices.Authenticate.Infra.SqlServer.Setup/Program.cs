@@ -16,8 +16,9 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer.Setup
             creators.Add(new AppTableCreator(config));
             creators.Add(new UserTableCreator(config));
             creators.Add(new TokenTableCreator(config));
+            creators.Add(new PasswordRecoveryCreator(config));
 
-            foreach(var creator in creators)
+            foreach (var creator in creators)
             {
                 Console.WriteLine($"Criando tabela {creator.TableName}...");
                 bool create = await creator.Create();

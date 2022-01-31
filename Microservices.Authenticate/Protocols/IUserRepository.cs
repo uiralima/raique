@@ -9,5 +9,6 @@ namespace Raique.Microservices.Authenticate.Protocols
         Task<int> Create(User user);
         Task<User> GetById(int userId);
         Task ChangePassword(int userId, string password);
+        Task<bool> ChangePasswordByCode(string userName, string code, string password);
     }
 }

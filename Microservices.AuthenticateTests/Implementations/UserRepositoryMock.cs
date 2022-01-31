@@ -17,6 +17,8 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
         public int GetByKeyToAppCount { get; private set; }
         public int GetByIdCount { get; private set; }
         public int ChangePasswordCount { get; private set; }
+        public int ChangePasswordByCodeCount { get; private set; }
+        
 
         private UserRepositoryMock()
         {
@@ -24,6 +26,7 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
             GetByKeyToAppCount = 0;
             GetByIdCount = 0;
             ChangePasswordCount = 0;
+            ChangePasswordByCodeCount = 0;
         }
 
         public async Task<int> Create(User user)
@@ -96,6 +99,15 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
             await Task.Run(() =>
             {
                 ChangePasswordCount++;
+            });
+        }
+
+        public async Task<bool> ChangePasswordByCode(string userName, string code, string password)
+        {
+            return await Task.Run(() =>
+            {
+                ChangePasswordByCodeCount++;
+                return true;
             });
         }
     }

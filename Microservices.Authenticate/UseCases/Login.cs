@@ -51,6 +51,8 @@ namespace Raique.Microservices.Authenticate.UseCases
             InvalidUsernameOrPasswordExceptionCreator.ThrowIfFalse(user.IsValid());
             string typedPassword = PasswordCreator.Create(_password, user.CheckKey);
             InvalidUsernameOrPasswordExceptionCreator.ThrowIfFalse(user.Password.Equals(typedPassword));
+            user.Password = String.Empty;
+            user.CheckKey = String.Empty;
             string token = _tokenCreator.Create(user, _device, _appKey);
             await _tokenRepository.Create(user.UserId, _device, token);
             return token;

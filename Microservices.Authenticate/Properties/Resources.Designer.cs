@@ -122,5 +122,14 @@ namespace Raique.Microservices.Authenticate.Properties {
                 return ResourceManager.GetString("ExceptionUserAlreadExists", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Dados inválidos.
+        /// </summary>
+        internal static string ExceptionUserNotExists {
+            get {
+                return ResourceManager.GetString("ExceptionUserNotExists", resourceCulture);
+            }
+        }
     }
 }

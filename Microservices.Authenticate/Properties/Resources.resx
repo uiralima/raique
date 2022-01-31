@@ -138,4 +138,7 @@
   <data name="ExceptionUserAlreadExists" xml:space="preserve">
     <value>Usuário {0} já existe!</value>
   </data>
+  <data name="ExceptionUserNotExists" xml:space="preserve">
+    <value>Dados inválidos</value>
+  </data>
 </root>
