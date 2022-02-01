@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace Raique.Microservices.Authenticate.Infra.SqlServer
 {
-    public class PasswordRecoveryRepository : Raique.Database.SqlServer.Contracts.Base,
+    public class PasswordRecoveryRepositoryImpl : Raique.Database.SqlServer.Contracts.Base,
         Raique.Microservices.Authenticate.Protocols.IPasswordRecoveryRepository
     {
-        public PasswordRecoveryRepository(IDatabaseConfig config) : base(config)
+        public PasswordRecoveryRepositoryImpl(IDatabaseConfig config) : base(config)
         {
         }
 

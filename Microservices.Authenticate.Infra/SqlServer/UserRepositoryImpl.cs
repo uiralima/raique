@@ -24,7 +24,7 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer
             }
         }
 
-        public async Task<bool> ChangePasswordByCode(string userName, string code, string password)
+        public async Task<bool> ChangePasswordByCode(string userName, string code, string password, string appKey)
         {
             string query = @"
                             DELETE PasswordRecovery WHERE CreatedDate < @limitDate
@@ -33,13 +33,13 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer
                                         code 
                                     FROM 
                                         PasswordRecovery AS pr INNER JOIN
-                                        [User] AS us ON (pr.[UserId] = us.[UserId])
+                                        [User] AS us ON (pr.[UserId] = us.[UserId] AND AppKey = @appKey)
                                     WHERE
                                         us.[Key] = @userName AND
                                         pr.[Code] = @code
                                 )
                             BEGIN
-                                UPDATE [dbo].[User] SET [Password] = @password WHERE [Key] = @userName
+                                UPDATE [dbo].[User] SET [Password] = @password WHERE [Key] = @userName AND [AppKey] = @appKey
                                 DELETE PasswordRecovery WHERE [Code] = @code
                                 SELECT CAST(1 AS BIT) 
                             END
@@ -52,6 +52,7 @@ namespace Raique.Microservices.Authenticate.Infra.SqlServer
                     .AddParameter("@limitDate", Raique.Library.DateUtilities.Now.AddDays(-2))
                     .AddParameter("@userName", userName)
                     .AddParameter("@code", code)
+                    .AddParameter("@appKey", appKey)
                     .AddParameter("@password", password);
                 using (var reader = await session.ExecuteReaderAsync())
                 {

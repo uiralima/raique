@@ -102,7 +102,7 @@ namespace Raique.Microservices.AuthenticateTests.Implementations
             });
         }
 
-        public async Task<bool> ChangePasswordByCode(string userName, string code, string password)
+        public async Task<bool> ChangePasswordByCode(string userName, string code, string password, string appKey)
         {
             return await Task.Run(() =>
             {

@@ -8,6 +8,9 @@ namespace Raique.Microservices.Authenticate.UseCases
 {
     public class CreatePasswordRecovery
     {
+        public static async Task<string> Execute(IPasswordRecoveryRepository passwordRecoveryRepository, IUserRepository userRepository, ICodeCreator codeCreator, string userName, string appKey) =>
+            await new CreatePasswordRecovery(passwordRecoveryRepository, userRepository, codeCreator, userName, appKey).Do();
+
         private readonly IPasswordRecoveryRepository _passwordRecoveryRepository;
         private readonly IUserRepository _userRepository;
         private readonly ICodeCreator _codeCreator;
@@ -35,12 +38,13 @@ namespace Raique.Microservices.Authenticate.UseCases
             _appKey.ThrowIfIsNullOrEmpty("appKey");
         }
 
-        private async Task Do()
+        private async Task<string> Do()
         {
             var user = await _userRepository.GetByKeyToApp(_userName, _appKey);
             UserNotExistsExceptionCreator.ThrowIfFalse(user.IsValid());
-            string code = _codeCreator.Create(7);
+            string code = _codeCreator.Create(7, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
             await _passwordRecoveryRepository.Create(user.UserId, code);
+            return code;
         }
     }
 }
